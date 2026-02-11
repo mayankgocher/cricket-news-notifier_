@@ -1,0 +1,48 @@
+# Backend
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+pydantic-settings
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]
+email-validator
+
+# Pipeline & AI
+langchain
+langchain-groq
+langgraph
+groq
+
+# Sentiment Analysis
+transformers
+torch
+
+# Data Sources
+praw
+tweepy
+feedparser
+
+# Web Search
+duckduckgo-search
+ddgs
+
+# Vector DB & Embeddings
+chromadb
+sentence-transformers
+
+# Notifiers
+python-telegram-bot
+
+# Scheduler
+apscheduler
+
+# Frontend
+streamlit
+
+# Utilities
+python-dotenv
+requests
+pandas
+pytz
