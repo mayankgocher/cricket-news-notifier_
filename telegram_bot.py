@@ -9,12 +9,29 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 import sys
 import os
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Fix path issues
+project_root = os.path.dirname(os.path.abspath(__file__))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from src.config.settings import TELEGRAM_BOT_TOKEN
-from src.rag.query_engine import QueryEngine
 from backend.database import SessionLocal
 from backend.models import Subscriber
+
+# Import RAG only when needed to avoid startup issues
+query_engine = None
+
+def get_query_engine():
+    """Lazy load query engine"""
+    global query_engine
+    if query_engine is None:
+        try:
+            from src.rag.query_engine import QueryEngine
+            query_engine = QueryEngine()
+        except Exception as e:
+            print(f"⚠️ RAG not available: {e}")
+            query_engine = None
+    return query_engine
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -147,14 +164,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await update.message.reply_text("🔍 Searching...")
         
-        engine = QueryEngine()
+        engine = get_query_engine()
+        if engine is None:
+            await update.message.reply_text("Sorry, the Q&A system is not available right now. Try /latest for recent news.")
+            return
+        
         answer = engine.answer(question)
         
         await update.message.reply_text(answer)
     
     except Exception as e:
         print(f"Error: {e}")
-        await update.message.reply_text("Sorry, I couldn't find an answer. Try asking something else!")
+        await update.message.reply_text("Sorry, I couldn't find an answer. Try asking something else or use /latest!")
 
 
 def main():
