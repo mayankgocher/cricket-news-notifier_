@@ -4,9 +4,11 @@ Admin Page - Pipeline control and monitoring
 
 import streamlit as st
 import requests
+import os
 from datetime import datetime
 
-API_URL = "http://localhost:8000"
+# Configure API URL - use environment variable or deployed URL
+API_URL = os.getenv("API_URL", "https://cricket-news-app.onrender.com")
 
 
 def render():
@@ -151,6 +153,6 @@ def render():
     
     except requests.exceptions.ConnectionError:
         st.error("❌ Cannot connect to API server")
-        st.info("Make sure to run: `uvicorn backend.main:app --reload`")
+        st.info(f"Make sure API is running at: {API_URL}")
     except Exception as e:
         st.error(f"Error: {str(e)}")

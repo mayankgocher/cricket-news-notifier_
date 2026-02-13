@@ -1,0 +1,37 @@
+name: Keep Render Service Alive
+
+on:
+  schedule:
+    # Run every 10 minutes (Render sleeps after 15 mins)
+    - cron: '*/10 * * * *'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  ping-service:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Ping Health Endpoint
+        run: |
+          echo "🏓 Pinging service..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://cricket-news-app.onrender.com/health)
+          echo "Response code: $response"
+          if [ "$response" = "200" ]; then
+            echo "✅ Service is alive!"
+          else
+            echo "⚠️ Service returned $response"
+          fi
+          
+      - name: Ping Root Endpoint
+        run: |
+          echo "🏓 Pinging root..."
+          curl -s https://cricket-news-app.onrender.com/ > /dev/null || echo "Root endpoint check"
+          
+      - name: Check Subscriber Count
+        run: |
+          echo "📊 Checking subscriber stats..."
+          curl -s https://cricket-news-app.onrender.com/subscribers/count || echo "Stats unavailable"
+          
+      - name: Log Timestamp
+        run: |
+          echo "⏰ Keep-alive completed at $(date)"

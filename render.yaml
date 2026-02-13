@@ -1,33 +1,63 @@
 services:
-  # Backend API
+  # Single Web Service - Runs Backend API + Telegram Bot
   - type: web
-    name: cricket-news-api
-    runtime: python
+    name: cricket-news-app
+    env: python
+    region: oregon
     plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      python init_db.py
+    # Start both FastAPI and Telegram bot using supervisor/custom script
+    startCommand: python start_services.py
     envVars:
       - key: PYTHON_VERSION
-        value: "3.12"
-
-  # Frontend Streamlit
-  - type: web
-    name: cricket-news-frontend
-    runtime: python
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: streamlit run frontend/app.py --server.port $PORT --server.address 0.0.0.0
-    envVars:
-      - key: PYTHON_VERSION
-        value: "3.12"
-
-  # Telegram Bot (Background Worker)
-  - type: worker
-    name: cricket-news-telegram-bot
-    runtime: python
-    plan: free
-    buildCommand: pip install -r requirements.txt
-    startCommand: python telegram_bot.py
-    envVars:
-      - key: PYTHON_VERSION
-        value: "3.12"
+        value: 3.12.0
+      - key: PORT
+        sync: false  # Render auto-assigns this
+      - key: GROQ_API_KEY
+        sync: false
+      - key: TWITTER_BEARER_TOKEN
+        sync: false
+      - key: REDDIT_CLIENT_ID
+        sync: false
+      - key: REDDIT_CLIENT_SECRET
+        sync: false
+      - key: REDDIT_USER_AGENT
+        value: CricketNewsBot/1.0
+      - key: SMTP_SERVER
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_EMAIL
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: SQLITE_DB_PATH
+        value: /opt/render/project/src/data/cricket_news.db
+      - key: VECTORDB_PATH
+        value: /opt/render/project/src/data/vectordb
+      - key: VERIFICATION_ENABLED
+        value: false
+      - key: SITE_URL
+        sync: false  # Set to https://cricket-news-app.onrender.com after deployment
+      - key: SCHEDULER_HOUR
+        value: 8
+      - key: SCHEDULER_MINUTE
+        value: 0
+      - key: TIMEZONE
+        value: Asia/Kolkata
+      - key: FRONTEND_URL
+        value: https://cricket-news-app.onrender.com
+    
+    # Health check endpoint
+    healthCheckPath: /health
+    
+    # Persistent disk for database and vector storage (free tier gets 1GB)
+    disk:
+      name: cricket-data
+      mountPath: /opt/render/project/src/data
+      sizeGB: 1

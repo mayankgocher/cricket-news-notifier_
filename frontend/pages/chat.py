@@ -4,8 +4,10 @@ Chat Page - RAG-powered Q&A about cricket news
 
 import streamlit as st
 import requests
+import os
 
-API_URL = "http://localhost:8000"
+# Configure API URL - use environment variable or deployed URL
+API_URL = os.getenv("API_URL", "https://cricket-news-app.onrender.com")
 
 
 def render():

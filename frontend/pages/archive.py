@@ -4,9 +4,11 @@ Archive Page - View past newsletters
 
 import streamlit as st
 import requests
+import os
 from datetime import datetime
 
-API_URL = "http://localhost:8000"
+# Configure API URL - use environment variable or deployed URL
+API_URL = os.getenv("API_URL", "https://cricket-news-app.onrender.com")
 
 
 def render():

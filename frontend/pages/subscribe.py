@@ -4,8 +4,10 @@ Subscribe Page - Email and Telegram subscription
 
 import streamlit as st
 import requests
+import os
 
-API_URL = "http://localhost:8000"
+# Configure API URL - use environment variable or deployed URL
+API_URL = os.getenv("API_URL", "https://cricket-news-app.onrender.com")
 
 
 def render():
@@ -63,7 +65,7 @@ def render():
         **Steps to subscribe via Telegram:**
         
         1. Open Telegram
-        2. Search for our bot: `@YourCricketBot`
+        2. Search for our bot: `@Cricket_daily_digest_bot`
         3. Start the bot
         4. Send `/subscribe`
         5. Done! ✅

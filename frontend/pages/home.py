@@ -4,6 +4,10 @@ Home Page - Landing page with project intro
 
 import streamlit as st
 import requests
+import os
+
+# Configure API URL - use environment variable or deployed URL
+API_URL = os.getenv("API_URL", "https://cricket-news-app.onrender.com")
 
 
 def render():
@@ -43,7 +47,7 @@ def render():
         
         # Fetch stats from API
         try:
-            response = requests.get("http://localhost:8000/subscribers/count", timeout=5)
+            response = requests.get(f"{API_URL}/subscribers/count", timeout=5)
             if response.status_code == 200:
                 data = response.json()
                 st.metric("Total Subscribers", data.get("total", 0))
